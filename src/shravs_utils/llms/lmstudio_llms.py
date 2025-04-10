@@ -6,7 +6,7 @@ import re
 from typing import Optional, Any, Sequence
 from pydantic import Field
 
-LMSTUDIO_SERVER_API_HOST = "localhost:1234"
+LMSTUDIO_SERVER_API_HOST = "localhost:11432"
 
 # This must be the *first* SDK interaction (otherwise the SDK will
 # implicitly attempt to access the default server instance)
@@ -36,14 +36,13 @@ class LmstudioLLM(LLM):
             if not loaded_models:
                 raise ValueError(
                     "No models loaded. Please load a model first.")
-            lm_model = loaded_models[0]  # type: ignore
+            lm_model = client.llm()  # type: ignore
             if not isinstance(lm_model, lms.LLM):
                 raise ValueError(
                     "Provided model is not a valid lmstudio model.")
         # Pass the required fields to the BaseModel constructor.
         super().__init__(
             name=lm_model.identifier,
-            verbose=True,
             lm_model=lm_model,  # type: ignore
             prompt_prefix=prompt_prefix,  # type: ignore
             last_metadata={},  # type: ignore
@@ -116,7 +115,7 @@ def get_llm() -> Optional[LmstudioLLM]:
         return llm
     except Exception as e:
         print(f"Error loading model: {e}")
-        raise
+        raise 
 
 
 if __name__ == "__main__":
